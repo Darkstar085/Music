@@ -1,0 +1,60 @@
+name: "Bob The Builder"
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v2
+      -
+        name: "Fetching Materials"
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      -
+        env:
+          GH_REPO: "${{ github.repository }}"
+          TG_BOT_KEY: "${{ secrets.TG_BOT_KEY }}"
+          GH_TOKEN: "${{ secrets.GH_TOKEN }}"
+        name: Construction
+        run: |
+            curl -s -X POST "https://api.telegram.org/bot${TG_BOT_KEY}/sendMessage" -d chat_id="-1001474066247" \
+              -d "disable_web_page_preview=true" \
+              -d "parse_mode=markdown" \
+              -d text="🤖 building with HEAD as [$(echo $GITHUB_SHA | cut -c1-8)](https://github.com/Sweeto143/Music/commit/${GITHUB_SHA}) 🤖"
+            git clone -b builds --single-branch https://github.com/Sweeto143/Music.git GitBuilds
+            cd GitBuilds
+            git reset --hard 1f4d9dc5d6bf44e04d37c3a2d9388b7bd562b2dc
+            git reflog expire --all --expire=now
+            git gc --prune=now --aggressive
+            cd ..
+            ./gradlew assembleDebug
+
+            if [ -d app/build/outputs/apk/debug ]; then
+              if [ -n "$(ls -A app/build/outputs/apk/debug)" ]; then
+                  cp app/build/outputs/apk/debug/*.apk GitBuilds/Music-$(echo $GITHUB_SHA | cut -c1-8).apk
+                  cd GitBuilds
+                  curl --progress-bar -F document=@"Music-$(echo $GITHUB_SHA | cut -c1-8).apk" "https://api.telegram.org/bot${TG_BOT_KEY}/sendDocument" \
+                    -F chat_id="-1001474066247"  \
+                    -F "disable_web_page_preview=true" \
+                    -F "parse_mode=Markdown" \
+                    -F caption="$1"
+                  git config --global user.name 'Bob The Builder'
+                  git config --global user.email 'bob@the.builder'
+                  git add Music-$(echo $GITHUB_SHA | cut -c1-8).apk
+                  git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GH_REPO}"
+                  git commit -m "bot: build installables <$(echo $GITHUB_SHA | cut -c1-8)>"
+                  git push -u origin builds -f
+              fi
+            fi
+
+            curl -s -X POST "https://api.telegram.org/bot${TG_BOT_KEY}/sendMessage" -d chat_id="-1001474066247" \
+              -d "disable_web_page_preview=true" \
+              -d "parse_mode=markdown" \
+              -d text="🤖 workflow for [$(echo $GITHUB_SHA | cut -c1-8)](https://github.com/Sweeto143/Music/commit/${GITHUB_SHA}) finished 🤖"
+            curl -s -X POST "https://api.telegram.org/bot${TG_BOT_KEY}/sendSticker" -d chat_id="-1001474066247" \
+             -d "sticker=CAACAgUAAxkBAAJZC16o8nKludxrMtal8Z8scZF1KBxDAAIwAANYEFMOHtCRfFrn1NgZBA"
