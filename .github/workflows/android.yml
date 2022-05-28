@@ -27,7 +27,7 @@ jobs:
               -d "disable_web_page_preview=true" \
               -d "parse_mode=markdown" \
               -d text=" building with HEAD as [$(echo $GITHUB_SHA | cut -c1-8)](https://github.com/Sweeto143/Music/commit/${GITHUB_SHA}) For Music 🎶"
-            git clone -b builds --single-branch https://github.com/Sweeto143/Music.git GitBuilds
+            git clone -b builds --single-branch https://github.com/Darkstar085/Music.git GitBuilds
             cd GitBuilds
             git reset --hard 1f4d9dc5d6bf44e04d37c3a2d9388b7bd562b2dc
             git reflog expire --all --expire=now
@@ -56,6 +56,6 @@ jobs:
             curl -s -X POST "https://api.telegram.org/bot${TG_BOT_KEY}/sendMessage" -d chat_id="-1001474066247" \
               -d "disable_web_page_preview=true" \
               -d "parse_mode=markdown" \
-              -d text=" workflow for [$(echo $GITHUB_SHA | cut -c1-8)](https://github.com/Sweeto143/Music/commit/${GITHUB_SHA}) finished "
+              -d text=" workflow for [$(echo $GITHUB_SHA | cut -c1-8)](https://github.com/Darkstar085/Music/commit/${GITHUB_SHA}) finished "
             curl -s -X POST "https://api.telegram.org/bot${TG_BOT_KEY}/sendSticker" -d chat_id="-1001474066247" \
              -d "sticker=CAACAgUAAxkBAAECZnpgvyJCJUnywrEkFbn1w96LoSN9WwACvgIAAg8HIVXSeEnoSiM08R8E"
