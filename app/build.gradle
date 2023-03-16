@@ -88,7 +88,7 @@ dependencies {
     implementation "androidx.core:core-splashscreen:1.0.0"
 
     implementation "com.google.android.material:material:$mdc_version"
-    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     def material_dialog_version = "3.3.0"
     implementation "com.afollestad.material-dialogs:core:$material_dialog_version"
